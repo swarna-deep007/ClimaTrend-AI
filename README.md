@@ -1,0 +1,1 @@
+# ClimaTrend-AI
