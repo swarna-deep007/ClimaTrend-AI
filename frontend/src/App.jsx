@@ -1,133 +1,77 @@
-import { useState } from "react";
-import axios from "axios";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ThemeProvider } from './context/ThemeContext';
+import { useEffect, useState } from 'react';
+import Home from './pages/Home';
+import Predict from './pages/Predict';
+import Contact from './pages/Contact';
 
 function App() {
-  const [form, setForm] = useState({
-    predictionType: "rainfall",
-    country: "India",
-    city: "",
-    date: "",
-  });
+  const [mouseTrail, setMouseTrail] = useState([]);
 
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      const particle = {
+        id: Math.random(),
+        x: e.clientX,
+        y: e.clientY,
+        createdAt: Date.now(),
+      };
 
-  // Handle input changes
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+      setMouseTrail(prev => {
+        const newTrail = [...prev, particle];
+        // Keep only last 15 particles
+        return newTrail.slice(-15);
+      });
+    };
 
-  // Handle form submit
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setResult(null);
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
-    try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/predict-weather",
-        {
-          country: form.country,
-          city: form.city,
-          date: form.date,
-          prediction_type: form.predictionType,
-        }
-      );
-
-      setResult(response.data);
-    } catch (error) {
-      console.error(error);
-      alert("Error connecting to backend");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Clean up old particles
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      setMouseTrail(prev => prev.filter(p => now - p.createdAt < 800));
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center p-6">
-      
-      {/* Title */}
-      <h1 className="text-4xl font-bold text-blue-500 mb-10">
-        Climate AI 🌦️
-      </h1>
+    <ThemeProvider>
+      {/* Mouse Trail Effect */}
+      <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 9999 }}>
+        {mouseTrail.map((particle) => {
+          const age = (Date.now() - particle.createdAt) / 800; // 0 to 1
+          const opacity = 1 - age;
+          return (
+            <div
+              key={particle.id}
+              style={{
+                position: 'absolute',
+                left: particle.x,
+                top: particle.y,
+                width: '12px',
+                height: '12px',
+                borderRadius: '50%',
+                background: `linear-gradient(135deg, rgba(0, 212, 255, ${opacity * 0.8}), rgba(124, 58, 237, ${opacity * 0.6}))`,
+                boxShadow: `0 0 ${10 * (1 - age) + 5}px rgba(0, 212, 255, ${opacity * 0.6})`,
+                transform: `translate(-50%, -50%) scale(${1 - age * 0.5})`,
+                backdropFilter: 'blur(2px)',
+              }}
+            />
+          );
+        })}
+      </div>
 
-      {/* Form */}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-gray-800 p-6 rounded-2xl shadow-lg w-full max-w-md space-y-4"
-      >
-        {/* Prediction Type */}
-        <select
-          name="predictionType"
-          value={form.predictionType}
-          onChange={handleChange}
-          className="w-full p-2 rounded bg-gray-700"
-        >
-          <option value="rainfall">Rainfall</option>
-          <option value="temperature">Temperature</option>
-          <option value="snowfall">Snowfall</option>
-        </select>
-
-        {/* Country */}
-        <select
-          name="country"
-          value={form.country}
-          onChange={handleChange}
-          className="w-full p-2 rounded bg-gray-700"
-        >
-          <option value="India">India</option>
-          <option value="Japan">Japan</option>
-        </select>
-
-        {/* City */}
-        <input
-          type="text"
-          name="city"
-          placeholder="Enter city"
-          value={form.city}
-          onChange={handleChange}
-          className="w-full p-2 rounded bg-gray-700"
-          required
-        />
-
-        {/* Date */}
-        <input
-          type="date"
-          name="date"
-          value={form.date}
-          onChange={handleChange}
-          className="w-full p-2 rounded bg-gray-700"
-          required
-        />
-
-        {/* Button */}
-        <button
-          type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded font-semibold"
-        >
-          {loading ? "Predicting..." : "Predict"}
-        </button>
-      </form>
-
-      {/* Result */}
-      {result && (
-        <div className="mt-6 bg-gray-800 p-4 rounded-xl w-full max-w-md text-center">
-          <h2 className="text-xl font-semibold mb-2">Prediction Result</h2>
-          <p>{result.location}</p>
-          <p>{result.date}</p>
-          <p className="text-lg mt-2">{result.value}</p>
-          <p
-            className={`mt-1 font-bold ${
-              result.classification === "Extreme"
-                ? "text-red-500"
-                : "text-green-400"
-            }`}
-          >
-            {result.classification}
-          </p>
-        </div>
-      )}
-    </div>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/predict" element={<Predict />} />
+          <Route path="/contact" element={<Contact />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 }
 

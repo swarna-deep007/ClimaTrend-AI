@@ -87,11 +87,28 @@ def predict_weather(data):
             else:
                 classification = "Normal"
 
+        # 🔹 Get next 6 months trend data
+        trend_data = []
+        for i in range(6):
+            trend_date = date + pd.DateOffset(months=i)
+            if trend_date in series.index:
+                trend_value = round(float(series[trend_date]), 2)
+            else:
+                trend_value = round(float(series.iloc[min(i, len(series)-1)]), 2)
+            trend_data.append({
+                "month": trend_date.strftime("%b %Y"),
+                "value": trend_value
+            })
+
         return {
             "location": f"{data.country}, {data.city}",
             "date": data.date,
             "value": f"{value} {unit}",
-            "classification": classification
+            "classification": classification,
+            "prediction_type": prediction_type,
+            "unit": unit,
+            "numeric_value": value,
+            "trend": trend_data
         }
 
     except Exception as e:
