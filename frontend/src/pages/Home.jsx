@@ -97,30 +97,130 @@ function Home() {
             {/* Content Wrapper */}
             <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column' }}>
                 {/* Navbar */}
-                <nav style={{ backgroundColor: 'rgba(26, 26, 46, 0.95)', padding: '20px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)', position: 'sticky', top: 0, zIndex: 1000, backdropFilter: 'blur(10px)' }}>
-                    <div style={{ fontSize: '1.75rem', fontWeight: 'bold', background: 'linear-gradient(135deg, #00d4ff, #7c3aed)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                <nav style={{
+                    backgroundColor: 'rgba(26, 26, 46, 0.95)',
+                    padding: '20px 40px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 1000,
+                    backdropFilter: 'blur(10px)'
+                }}>
+
+                    {/* LOGO */}
+                    <div style={{
+                        fontSize: '1.75rem',
+                        fontWeight: 'bold',
+                        background: 'linear-gradient(135deg, #00d4ff, #7c3aed)',
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        cursor: 'pointer'
+                    }}>
                         ClimaTrend AI 🌦️
                     </div>
+
+                    {/* NAV LINKS */}
                     <div style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
-                        <a href="#features" style={{ color: 'white', textDecoration: 'none', fontSize: '1rem', cursor: 'pointer', transition: 'color 0.3s', borderBottom: '2px solid transparent' }} onMouseEnter={(e) => e.target.style.color = '#00d4ff'} onMouseLeave={(e) => e.target.style.color = 'white'}>
+
+                        {/* LIVE MAP ⭐ */}
+                        <Link
+                            to="/live"
+                            style={{
+                                color: 'white',
+                                textDecoration: 'none',
+                                fontSize: '1rem',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.target.style.color = '#00d4ff';
+                                e.target.style.transform = 'translateY(-2px)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.color = 'white';
+                                e.target.style.transform = 'translateY(0)';
+                            }}
+                        >
+                            Live 🌍
+                        </Link>
+
+                        {/* FEATURES */}
+                        <a
+                            href="#features"
+                            style={{
+                                color: 'white',
+                                textDecoration: 'none',
+                                fontSize: '1rem',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.target.style.color = '#00d4ff';
+                                e.target.style.transform = 'translateY(-2px)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.color = 'white';
+                                e.target.style.transform = 'translateY(0)';
+                            }}
+                        >
                             Features
                         </a>
+
+
+
+                        {/* ABOUT */}
                         <Link
                             to="/about"
-                            style={{ color: 'white', textDecoration: 'none', fontSize: '1rem', cursor: 'pointer', transition: 'color 0.3s' }}
-                            onMouseEnter={(e) => e.target.style.color = '#00d4ff'}
-                            onMouseLeave={(e) => e.target.style.color = 'white'}
+                            style={{
+                                color: 'white',
+                                textDecoration: 'none',
+                                fontSize: '1rem',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.target.style.color = '#00d4ff';
+                                e.target.style.transform = 'translateY(-2px)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.color = 'white';
+                                e.target.style.transform = 'translateY(0)';
+                            }}
                         >
                             About
                         </Link>
+
+                        {/* CTA BUTTON */}
                         <Link
                             to="/predict"
-                            style={{ backgroundColor: '#00d4ff', padding: '10px 24px', borderRadius: '24px', fontSize: '0.95rem', fontWeight: '600', textDecoration: 'none', color: '#1a1a2e', cursor: 'pointer', transition: 'transform 0.2s' }}
-                            onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                            onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                            style={{
+                                background: 'linear-gradient(135deg, #00d4ff, #7c3aed)',
+                                padding: '10px 26px',
+                                borderRadius: '24px',
+                                fontSize: '0.95rem',
+                                fontWeight: '600',
+                                textDecoration: 'none',
+                                color: 'white',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s',
+                                boxShadow: '0 4px 15px rgba(0, 212, 255, 0.4)'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.target.style.transform = 'scale(1.08)';
+                                e.target.style.boxShadow = '0 6px 20px rgba(124, 58, 237, 0.6)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.transform = 'scale(1)';
+                                e.target.style.boxShadow = '0 4px 15px rgba(0, 212, 255, 0.4)';
+                            }}
                         >
                             Try Now
                         </Link>
+
                     </div>
                 </nav>
 
