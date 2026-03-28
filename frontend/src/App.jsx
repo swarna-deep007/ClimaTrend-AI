@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Home from './pages/Home';
 import Predict from './pages/Predict';
 import Contact from './pages/Contact';
+import About from './pages/About';
 
 function App() {
   const [mouseTrail, setMouseTrail] = useState([]);
@@ -68,6 +69,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/predict" element={<Predict />} />
+          <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
         </Routes>
       </Router>
