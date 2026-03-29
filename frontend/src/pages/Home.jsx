@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom';
+import WeatherWidget from "../components/WeatherWidget";
 
 function Home() {
 
@@ -126,103 +127,35 @@ function Home() {
                     {/* NAV LINKS */}
                     <div style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
 
-                        {/* LIVE MAP ⭐ */}
-                        <Link
-                            to="/live"
-                            style={{
-                                color: 'white',
-                                textDecoration: 'none',
-                                fontSize: '1rem',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.target.style.color = '#00d4ff';
-                                e.target.style.transform = 'translateY(-2px)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.color = 'white';
-                                e.target.style.transform = 'translateY(0)';
-                            }}
-                        >
+                        <Link to="/live" style={{ color: 'white', textDecoration: 'none', fontSize: '1rem', cursor: 'pointer', transition: 'all 0.3s' }}
+                            onMouseEnter={(e) => { e.target.style.color = '#00d4ff'; e.target.style.transform = 'translateY(-2px)'; }}
+                            onMouseLeave={(e) => { e.target.style.color = 'white'; e.target.style.transform = 'translateY(0)'; }}>
                             Live 🌍
                         </Link>
 
-                        {/* FEATURES */}
-                        <a
-                            href="#features"
-                            style={{
-                                color: 'white',
-                                textDecoration: 'none',
-                                fontSize: '1rem',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.target.style.color = '#00d4ff';
-                                e.target.style.transform = 'translateY(-2px)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.color = 'white';
-                                e.target.style.transform = 'translateY(0)';
-                            }}
-                        >
+                        <a href="#features" style={{ color: 'white', textDecoration: 'none', fontSize: '1rem', cursor: 'pointer', transition: 'all 0.3s' }}
+                            onMouseEnter={(e) => { e.target.style.color = '#00d4ff'; e.target.style.transform = 'translateY(-2px)'; }}
+                            onMouseLeave={(e) => { e.target.style.color = 'white'; e.target.style.transform = 'translateY(0)'; }}>
                             Features
                         </a>
 
-
-
-                        {/* ABOUT */}
-                        <Link
-                            to="/about"
-                            style={{
-                                color: 'white',
-                                textDecoration: 'none',
-                                fontSize: '1rem',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.target.style.color = '#00d4ff';
-                                e.target.style.transform = 'translateY(-2px)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.color = 'white';
-                                e.target.style.transform = 'translateY(0)';
-                            }}
-                        >
+                        <Link to="/about" style={{ color: 'white', textDecoration: 'none', fontSize: '1rem', cursor: 'pointer', transition: 'all 0.3s' }}
+                            onMouseEnter={(e) => { e.target.style.color = '#00d4ff'; e.target.style.transform = 'translateY(-2px)'; }}
+                            onMouseLeave={(e) => { e.target.style.color = 'white'; e.target.style.transform = 'translateY(0)'; }}>
                             About
                         </Link>
 
-                        {/* CTA BUTTON */}
-                        <Link
-                            to="/predict"
-                            style={{
-                                background: 'linear-gradient(135deg, #00d4ff, #7c3aed)',
-                                padding: '10px 26px',
-                                borderRadius: '24px',
-                                fontSize: '0.95rem',
-                                fontWeight: '600',
-                                textDecoration: 'none',
-                                color: 'white',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s',
-                                boxShadow: '0 4px 15px rgba(0, 212, 255, 0.4)'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.target.style.transform = 'scale(1.08)';
-                                e.target.style.boxShadow = '0 6px 20px rgba(124, 58, 237, 0.6)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.transform = 'scale(1)';
-                                e.target.style.boxShadow = '0 4px 15px rgba(0, 212, 255, 0.4)';
-                            }}
-                        >
+                        <Link to="/predict" style={{ background: 'linear-gradient(135deg, #00d4ff, #7c3aed)', padding: '10px 26px', borderRadius: '24px', fontSize: '0.95rem', fontWeight: '600', textDecoration: 'none', color: 'white', cursor: 'pointer', transition: 'all 0.3s', boxShadow: '0 4px 15px rgba(0, 212, 255, 0.4)' }}
+                            onMouseEnter={(e) => { e.target.style.transform = 'scale(1.08)'; e.target.style.boxShadow = '0 6px 20px rgba(124, 58, 237, 0.6)'; }}
+                            onMouseLeave={(e) => { e.target.style.transform = 'scale(1)'; e.target.style.boxShadow = '0 4px 15px rgba(0, 212, 255, 0.4)'; }}>
                             Try Now
                         </Link>
 
                     </div>
                 </nav>
+
+                {/* 🌦️ WEATHER WIDGET — floating button bottom-right, click to open */}
+                <WeatherWidget />
 
                 {/* Hero Section */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 24px', textAlign: 'center' }}>
@@ -254,39 +187,16 @@ function Home() {
 
                     {/* CTA Buttons */}
                     <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                        <Link
-                            to="/predict"
+                        <Link to="/predict"
                             style={{ backgroundColor: 'linear-gradient(135deg, #00d4ff, #7c3aed)', padding: '16px 48px', borderRadius: '30px', fontSize: '1.125rem', fontWeight: '600', textDecoration: 'none', color: 'white', cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 8px 24px rgba(0, 212, 255, 0.3)' }}
                             onMouseEnter={(e) => { e.target.style.transform = 'scale(1.08)'; e.target.style.boxShadow = '0 12px 32px rgba(0, 212, 255, 0.5)'; }}
-                            onMouseLeave={(e) => { e.target.style.transform = 'scale(1)'; e.target.style.boxShadow = '0 8px 24px rgba(0, 212, 255, 0.3)'; }}
-                        >
+                            onMouseLeave={(e) => { e.target.style.transform = 'scale(1)'; e.target.style.boxShadow = '0 8px 24px rgba(0, 212, 255, 0.3)'; }}>
                             Get Started 🚀
                         </Link>
-                        <Link
-                            to="/about"
-                            style={{
-                                position: 'relative',
-                                padding: '16px 48px',
-                                borderRadius: '30px',
-                                fontSize: '1.125rem',
-                                fontWeight: '600',
-                                textDecoration: 'none',
-                                color: 'white',
-                                cursor: 'pointer',
-                                background: 'linear-gradient(135deg, #7c3aed, #db2777)',
-                                boxShadow: '0 8px 24px rgba(124, 58, 237, 0.35)',
-                                transition: 'transform 0.2s, box-shadow 0.2s',
-                                display: 'inline-block',
-                            }}
-                            onMouseEnter={(e) => {
-                                e.target.style.transform = 'scale(1.08)';
-                                e.target.style.boxShadow = '0 12px 32px rgba(219, 39, 119, 0.55)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.transform = 'scale(1)';
-                                e.target.style.boxShadow = '0 8px 24px rgba(124, 58, 237, 0.35)';
-                            }}
-                        >
+                        <Link to="/about"
+                            style={{ position: 'relative', padding: '16px 48px', borderRadius: '30px', fontSize: '1.125rem', fontWeight: '600', textDecoration: 'none', color: 'white', cursor: 'pointer', background: 'linear-gradient(135deg, #7c3aed, #db2777)', boxShadow: '0 8px 24px rgba(124, 58, 237, 0.35)', transition: 'transform 0.2s, box-shadow 0.2s', display: 'inline-block' }}
+                            onMouseEnter={(e) => { e.target.style.transform = 'scale(1.08)'; e.target.style.boxShadow = '0 12px 32px rgba(219, 39, 119, 0.55)'; }}
+                            onMouseLeave={(e) => { e.target.style.transform = 'scale(1)'; e.target.style.boxShadow = '0 8px 24px rgba(124, 58, 237, 0.35)'; }}>
                             Discover More ✨
                         </Link>
                     </div>
@@ -298,7 +208,6 @@ function Home() {
                         <h4 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '16px', color: '#00d4ff' }}>ClimaTrend AI</h4>
                         <p style={{ fontSize: '0.95rem', color: '#b0b0b0', lineHeight: '1.6' }}>Advanced weather prediction powered by artificial intelligence. Making climate data accessible and actionable for everyone.</p>
                     </div>
-
                     <div>
                         <h4 style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '16px', color: '#00d4ff' }}>Quick Links</h4>
                         <ul style={{ listStyle: 'none', padding: 0 }}>
@@ -308,7 +217,6 @@ function Home() {
                             <li><Link to="/contact" style={{ color: '#b0b0b0', textDecoration: 'none', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#00d4ff'} onMouseLeave={(e) => e.target.style.color = '#b0b0b0'}>Contact</Link></li>
                         </ul>
                     </div>
-
                     <div>
                         <h4 style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '16px', color: '#00d4ff' }}>Technology</h4>
                         <ul style={{ listStyle: 'none', padding: 0 }}>
@@ -318,7 +226,6 @@ function Home() {
                             <li><a href="#" style={{ color: '#b0b0b0', textDecoration: 'none', transition: 'color 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.target.style.color = '#00d4ff'} onMouseLeave={(e) => e.target.style.color = '#b0b0b0'}>Terms of Service</a></li>
                         </ul>
                     </div>
-
                     <div>
                         <h4 style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '16px', color: '#00d4ff' }}>Follow Us</h4>
                         <div style={{ display: 'flex', gap: '16px' }}>
