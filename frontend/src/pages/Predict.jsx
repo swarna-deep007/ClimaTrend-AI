@@ -855,7 +855,7 @@ function Predict() {
                       <div style={{ backgroundColor: 'rgba(0, 212, 255, 0.08)', padding: '32px', borderRadius: '14px', border: '2px solid rgba(0, 212, 255, 0.4)', backdropFilter: 'blur(15px)', marginBottom: '24px', animation: 'glow 3s ease-in-out infinite' }}>
                         <p style={{ color: '#b0b0b0', fontSize: '0.9rem', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Predicted Value</p>
                         <p style={{ fontSize: '3.5rem', color: '#00d4ff', fontWeight: 'bold', margin: '0 0 8px 0', textShadow: '0 0 20px rgba(0, 212, 255, 0.5)' }}>{result.value}</p>
-                        <p style={{ color: '#707070', fontSize: '1rem', margin: 0 }}>{result.unit}</p>
+                        {/* <p style={{ color: '#707070', fontSize: '1rem', margin: 0 }}>{result.unit}</p> */}
                       </div>
 
                       {/* Risk Classification */}

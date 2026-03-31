@@ -27,6 +27,13 @@ japan_rain_series = generate_series(japan_rain_model)
 
 
 # ================================
+# HELPER
+# ================================
+def f_to_c(f):
+    return round((f - 32) * 5 / 9, 2)
+
+
+# ================================
 # MAIN FUNCTION
 # ================================
 def predict_weather(data):
@@ -71,6 +78,10 @@ def predict_weather(data):
 
         value = round(float(value), 2)
 
+        # ✅ Convert F to C (only for temperature)
+        if prediction_type == "temperature":
+            value = f_to_c(value)
+
         # 🔹 Classification logic
         if prediction_type == "temperature":
             if value > 45:
@@ -95,6 +106,11 @@ def predict_weather(data):
                 trend_value = round(float(series[trend_date]), 2)
             else:
                 trend_value = round(float(series.iloc[min(i, len(series)-1)]), 2)
+
+            # ✅ Convert F to C in trend too (only for temperature)
+            if prediction_type == "temperature":
+                trend_value = f_to_c(trend_value)
+
             trend_data.append({
                 "month": trend_date.strftime("%b %Y"),
                 "value": trend_value
