@@ -19,6 +19,7 @@ function Predict() {
   const [activeTab, setActiveTab] = useState('result');
   const [showHistoryMobile, setShowHistoryMobile] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [cities, setCities] = useState([]);
 
   // Load history from localStorage on mount
   useEffect(() => {
@@ -45,6 +46,26 @@ function Predict() {
   useEffect(() => {
     localStorage.setItem("predictionHistory", JSON.stringify(history));
   }, [history]);
+
+  // Fetch cities when country changes
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const response = await axios.post("http://localhost:8000/get-cities", {
+          country: form.country,
+        });
+        setCities(response.data);
+        setForm((prevForm) => ({
+          ...prevForm,
+          city: "", // Reset city when country changes
+        }));
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+        setCities([]);
+      }
+    };
+    fetchCities();
+  }, [form.country]);
 
   // Generate AI Insights based on prediction
   const generateAIInsights = (prediction) => {
@@ -656,15 +677,20 @@ function Predict() {
             {/* City */}
             <div style={{ marginBottom: '16px' }}>
               <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '8px', color: '#00d4ff' }}>City</label>
-              <input
-                type="text"
+              <select
                 name="city"
-                placeholder="Enter city"
                 value={form.city}
                 onChange={handleChange}
                 style={{ width: '100%', padding: '10px', borderRadius: '8px', backgroundColor: '#0f3460', border: '2px solid rgba(0, 212, 255, 0.3)', color: 'white', fontSize: '1rem' }}
                 required
-              />
+              >
+                <option value="">Select a city</option>
+                {cities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Date */}
