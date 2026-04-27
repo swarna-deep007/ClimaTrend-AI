@@ -671,6 +671,7 @@ function Predict() {
               >
                 <option value="India">India</option>
                 <option value="Japan">Japan</option>
+                <option value="Canada">Canada</option>
               </select>
             </div>
 

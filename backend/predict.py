@@ -8,6 +8,9 @@ india_temp_model = joblib.load("models/india_temp_sarima_model.pkl")
 india_rain_model = joblib.load("models/india_rain_sarima_model.pkl")
 japan_temp_model = joblib.load("models/japan_temp_sarima_model.pkl")
 japan_rain_model = joblib.load("models/japan_rain_sarima_model.pkl")
+canada_temp_model = joblib.load("models/canada_temp_sarima_model.pkl")
+canada_rain_model = joblib.load("models/canada_rain_sarima_model.pkl")
+canada_snow_model = joblib.load("models/canada_snow_sarima_model.pkl")
 
 
 # ================================
@@ -23,6 +26,9 @@ india_temp_series = generate_series(india_temp_model)
 india_rain_series = generate_series(india_rain_model)
 japan_temp_series = generate_series(japan_temp_model)
 japan_rain_series = generate_series(japan_rain_model)
+canada_temp_series = generate_series(canada_temp_model)
+canada_rain_series = generate_series(canada_rain_model)
+canada_snow_series = generate_series(canada_snow_model)
 
 
 # ================================
@@ -38,6 +44,7 @@ def get_seasonal_factor(month, prediction_type):
     - Monsoon months (Jun-Sep): Higher rainfall
     - Summer months (Mar-May): Higher temperature
     - Winter months (Nov-Feb): Lower temperature
+    - Winter months (Nov-Feb): Higher snowfall in Canada
     """
     if prediction_type == "temperature":
         # Summer months (March-May): +2°C to +3°C increase
@@ -47,6 +54,19 @@ def get_seasonal_factor(month, prediction_type):
         elif month in [11, 12, 1, 2]:
             return -1.5
         # Moderate in other months
+        else:
+            return 0.0
+    elif prediction_type == "snowfall":
+        # Winter months (Dec-Feb): Heavy snowfall
+        if month in [12, 1, 2]:
+            return 50.0  # cm
+        # November and March: Moderate snowfall
+        elif month in [11, 3]:
+            return 20.0
+        # Late fall and early spring: Light snowfall
+        elif month in [10, 4]:
+            return 5.0
+        # Summer months: No snowfall
         else:
             return 0.0
     else:  # rainfall
@@ -77,6 +97,9 @@ def get_daily_variation(day_of_month, prediction_type):
     if prediction_type == "temperature":
         # Temperature variation: ±0.5°C within month
         return round((normalized_day - 0.5) * 1.0, 2)
+    elif prediction_type == "snowfall":
+        # Snowfall variation: ±3cm within month
+        return round((normalized_day - 0.5) * 6.0, 2)
     else:  # rainfall
         # Rainfall variation: ±5mm within month
         return round((normalized_day - 0.5) * 10.0, 2)
@@ -121,6 +144,19 @@ CITY_TEMP_OFFSETS = {
     "hiroshima": +1.5,      # Southern
     "sendai":    -2.0,      # Northern
     "kawasaki":  0.0,       # Central
+    # Canada - Coastal, Prairies, Northern, Mountain
+    "toronto":   +2.0,      # Eastern Urban
+    "vancouver": +1.0,      # Coastal Mild
+    "calgary":   -2.0,      # Mountain
+    "edmonton":  -3.0,      # Northern
+    "montreal":  -1.5,      # Eastern
+    "ottawa":    -1.0,      # Central
+    "winnipeg":  -4.0,      # Prairie
+    "quebec":    -2.0,      # Eastern
+    "halifax":   +1.5,      # Atlantic Coast
+    "calgary":   -2.0,      # Mountain
+    "victoria":  +2.5,      # Pacific Coast
+    "st_johns":  +0.0,      # Atlantic
 }
 
 CITY_RAIN_OFFSETS = {
@@ -158,6 +194,36 @@ CITY_RAIN_OFFSETS = {
     "hiroshima": +12.0,     # Moderate-High
     "sendai":    -8.0,      # Low
     "kawasaki":  +12.0,     # Moderate
+    # Canada
+    "toronto":   +40.0,     # Great Lakes influence
+    "vancouver": +60.0,     # Coastal rain dominant
+    "calgary":   -20.0,     # Low precipitation
+    "edmonton":  -15.0,     # Prairie, low rainfall
+    "montreal":  +35.0,     # Moderate-High
+    "ottawa":    +30.0,     # Moderate
+    "winnipeg":  -10.0,     # Low
+    "quebec":    +35.0,     # High
+    "halifax":   +50.0,     # Atlantic storms
+    "victoria":  +45.0,     # Pacific coast
+    "st_johns":  +55.0,     # Atlantic coastal
+}
+
+# ================================
+# CITY SNOWFALL OFFSETS - CANADA ONLY
+# ================================
+CITY_SNOW_OFFSETS = {
+    # Canada - Northern and Mountain regions have more snow
+    "toronto":   +10.0,     # Moderate snow
+    "vancouver": +5.0,      # Lower elevations, less snow
+    "calgary":   +35.0,     # Mountain region, heavy snow
+    "edmonton":  +25.0,     # Prairie, moderate-heavy snow
+    "montreal":  +20.0,     # Eastern, moderate snow
+    "ottawa":    +15.0,     # Central, moderate snow
+    "winnipeg":  +18.0,     # Prairie, moderate-high snow
+    "quebec":    +25.0,     # Eastern, heavy snow
+    "halifax":   +5.0,      # Coastal, light snow
+    "victoria":  +0.0,      # Pacific, minimal snow
+    "st_johns":  +8.0,      # Atlantic, light-moderate snow
 }
 
 # ================================
@@ -168,11 +234,14 @@ def get_cities(country):
     country = country.lower()
     india_cities = ['Ahmedabad', 'Bangalore', 'Chandigarh', 'Chennai', 'Delhi', 'Goa', 'Hyderabad', 'Indore', 'Jaipur', 'Kochi', 'Kolkata', 'Lucknow', 'Mumbai', 'Nagpur', 'Patna', 'Pune', 'Shimla', 'Surat', 'Thiruvananthapuram', 'Varanasi']
     japan_cities = ['Fukuoka', 'Hakodate', 'Hiroshima', 'Kawasaki', 'Kobe', 'Kyoto', 'Nagoya', 'Osaka', 'Sapporo', 'Sendai', 'Tokyo', 'Yokohama']
+    canada_cities = ['Calgary', 'Edmonton', 'Halifax', 'Montreal', 'Ottawa', 'Quebec', 'St_Johns', 'Toronto', 'Vancouver', 'Victoria', 'Winnipeg']
     
     if country == 'india':
         return sorted(india_cities)
     elif country == 'japan':
         return sorted(japan_cities)
+    elif country == 'canada':
+        return sorted(canada_cities)
     return []
 
 
@@ -210,6 +279,18 @@ def predict_weather(data):
             series = japan_rain_series
             unit = "mm"
 
+        elif country == "canada" and prediction_type == "temperature":
+            series = canada_temp_series
+            unit = "°C"
+
+        elif country == "canada" and prediction_type == "rainfall":
+            series = canada_rain_series
+            unit = "mm"
+
+        elif country == "canada" and prediction_type == "snowfall":
+            series = canada_snow_series
+            unit = "cm"
+
         else:
             return {
                 "location": f"{data.country}, {data.city}",
@@ -238,7 +319,20 @@ def predict_weather(data):
             # Add daily variation within month
             daily_var = get_daily_variation(original_day, prediction_type)
             value = round(value + daily_var, 2)
-        else:
+        elif prediction_type == "snowfall":
+            value = round(value + CITY_SNOW_OFFSETS.get(city_key, 0.0), 2)
+            
+            # Add seasonal adjustment for realistic month-wise snowfall
+            seasonal_adj = get_seasonal_factor(original_month, prediction_type)
+            value = round(value + seasonal_adj, 2)
+            
+            # Add daily variation within month
+            daily_var = get_daily_variation(original_day, prediction_type)
+            value = round(value + daily_var, 2)
+            
+            # Ensure snowfall is never negative
+            value = max(0, value)
+        else:  # rainfall
             value = round(value + CITY_RAIN_OFFSETS.get(city_key, 0.0), 2)
             
             # Add seasonal adjustment for realistic month-wise rainfall
@@ -260,7 +354,14 @@ def predict_weather(data):
                 classification = "Moderate"
             else:
                 classification = "Normal"
-        else:
+        elif prediction_type == "snowfall":
+            if value > 30:
+                classification = "Extreme"
+            elif value > 10:
+                classification = "Moderate"
+            else:
+                classification = "Normal"
+        else:  # rainfall
             if value > 100:
                 classification = "Extreme"
             elif value > 20:
@@ -286,7 +387,17 @@ def predict_weather(data):
                 trend_month = trend_date.month
                 seasonal_adj = get_seasonal_factor(trend_month, prediction_type)
                 trend_value = round(trend_value + seasonal_adj, 2)
-            else:
+            elif prediction_type == "snowfall":
+                trend_value = round(trend_value + CITY_SNOW_OFFSETS.get(city_key, 0.0), 2)
+                
+                # Add seasonal factor for trend month
+                trend_month = trend_date.month
+                seasonal_adj = get_seasonal_factor(trend_month, prediction_type)
+                trend_value = round(trend_value + seasonal_adj, 2)
+                
+                # Ensure snowfall is never negative
+                trend_value = max(0, trend_value)
+            else:  # rainfall
                 trend_value = round(trend_value + CITY_RAIN_OFFSETS.get(city_key, 0.0), 2)
                 
                 # Add seasonal factor for trend month
