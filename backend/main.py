@@ -1,6 +1,7 @@
 ﻿from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from predict import predict_weather, get_cities
+from advanced_predict import predict_extreme_weather
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -20,6 +21,10 @@ class WeatherRequest(BaseModel):
     date: str
     prediction_type: str
 
+class AdvancedPredictRequest(BaseModel):
+    city: str
+    date: str
+
 @app.get("/")
 def home():
     return {"message": "Climate AI Backend Running"}
@@ -34,3 +39,21 @@ async def get_cities_endpoint(request: Request):
 @app.post("/predict-weather")
 def predict(data: WeatherRequest):
     return predict_weather(data)
+
+@app.post("/api/advanced-predict")
+def advanced_predict(data: AdvancedPredictRequest):
+    """
+    Advanced extreme weather prediction endpoint
+    Uses OpenWeather forecast API + XGBoost model
+    """
+    try:
+        result = predict_extreme_weather(data.city, data.date)
+        return result
+    except Exception as e:
+        import traceback
+        print(f"Error in /api/advanced-predict: {traceback.format_exc()}")
+        return {
+            "error": f"Server error: {str(e)}",
+            "success": False,
+            "detail": str(e)
+        }

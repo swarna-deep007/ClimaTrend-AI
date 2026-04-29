@@ -3,6 +3,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { useEffect, useState } from 'react';
 import Home from './pages/Home';
 import Predict from './pages/Predict';
+import AdvancedPredict from './pages/AdvancedPredict';
 import Contact from './pages/Contact';
 import About from './pages/About';
 import Live from './pages/Live';
@@ -70,6 +71,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/predict" element={<Predict />} />
+          <Route path="/advanced-predict" element={<AdvancedPredict />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/live" element={<Live />} /> 

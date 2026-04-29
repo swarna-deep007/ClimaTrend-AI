@@ -145,6 +145,12 @@ function Home() {
                             About
                         </Link>
 
+                        <Link to="/advanced-predict" style={{ color: '#ff6b35', textDecoration: 'none', fontSize: '1rem', cursor: 'pointer', transition: 'all 0.3s', fontWeight: '600' }}
+                            onMouseEnter={(e) => { e.target.style.color = '#ff8a50'; e.target.style.transform = 'translateY(-2px)'; }}
+                            onMouseLeave={(e) => { e.target.style.color = '#ff6b35'; e.target.style.transform = 'translateY(0)'; }}>
+                            Advanced ⚡
+                        </Link>
+
                         <Link to="/predict" style={{ background: 'linear-gradient(135deg, #00d4ff, #7c3aed)', padding: '10px 26px', borderRadius: '24px', fontSize: '0.95rem', fontWeight: '600', textDecoration: 'none', color: 'white', cursor: 'pointer', transition: 'all 0.3s', boxShadow: '0 4px 15px rgba(0, 212, 255, 0.4)' }}
                             onMouseEnter={(e) => { e.target.style.transform = 'scale(1.08)'; e.target.style.boxShadow = '0 6px 20px rgba(124, 58, 237, 0.6)'; }}
                             onMouseLeave={(e) => { e.target.style.transform = 'scale(1)'; e.target.style.boxShadow = '0 4px 15px rgba(0, 212, 255, 0.4)'; }}>
