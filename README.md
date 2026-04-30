@@ -1,90 +1,152 @@
-# 🌍 Climate-AI: Intelligent Weather Prediction System
+# 🌍 ClimaTrend-AI: Intelligent Climate & Extreme Weather Prediction System
 
-> *“We stitch patterns, AI predicts the future.”*
+> *“From patterns to predictions — AI that understands climate.”*
 
-Climate-AI is an intelligent weather prediction system that uses time-series forecasting combined with smart climate-based adjustments to deliver realistic, location-aware predictions for temperature and rainfall.
+ClimaTrend-AI is an advanced weather intelligence platform that combines **time-series forecasting, machine learning, and real-time weather APIs** to predict both **climate trends** and **extreme weather events**.
 
-Built with a focus on simplicity, explainability, and real-world behavior, this project demonstrates how AI can be enhanced with domain knowledge to produce meaningful results.
+This project goes beyond basic forecasting by integrating **domain knowledge + AI models** to deliver realistic, explainable, and actionable predictions.
 
 ---
 
-## 🚀 Features
+## 🚀 Key Features
 
-✨ **AI-Based Forecasting**
+### 🌡️ Climate Forecasting (SARIMA)
 
-* Uses SARIMA (Seasonal ARIMA) for time-series prediction
-* Learns long-term climate trends and seasonality
+* Uses **SARIMA (Seasonal ARIMA)** for long-term trend prediction
+* Captures **seasonality, trends, and cyclic patterns**
+* Generates smooth forecasts for future dates
 
-🌆 **City-Level Predictions (Smart Enhancement)**
+---
 
-* Applies realistic city-based climate offsets
-* Handles diverse regions like coastal, urban, and mountainous areas
+### ⚡ Extreme Weather Detection (XGBoost + API)
 
-📅 **Date-Aware Predictions**
+* Real-time prediction using **OpenWeather API**
+* Machine learning model (**XGBoost**) detects:
 
-* Supports predictions for any selected date
-* Maintains seasonal consistency
+  * Heavy Rain 🌧️
+  * Heatwaves 🔥
+  * Cold Waves ❄️
+* Combines **model prediction + domain thresholds**
 
-📊 **Trend Visualization**
+---
 
-* Displays next 6 months of forecast data
-* Smooth and continuous predictions
+### 🌆 Smart City-Level Adjustments
 
-🌦️ **Dual Prediction Modes**
+* Enhances predictions using **city-specific climate behavior**
+* Examples:
 
-* 🌡️ Temperature Forecasting
-* 🌧️ Rainfall Forecasting
+  * Delhi → hotter (+4°C)
+  * Shimla → colder (-12°C)
+  * Mumbai → higher rainfall
+
+---
+
+### 📅 Date-Aware Predictions
+
+* Supports user-selected dates
+* Ensures predictions remain **seasonally consistent**
+
+---
+
+### 📊 Interactive Visualization
+
+* Forecast trends for upcoming months
+* Helps understand long-term climate behavior
+
+---
+
+### 🌐 Full-Stack Application
+
+* Clean UI with React
+* Fast backend using FastAPI
+* Integrated AI + API pipeline
 
 ---
 
 ## 🧠 How It Works
 
-The system combines **machine learning + domain intelligence**:
+### 1️⃣ Time-Series Modeling (SARIMA)
 
-### 1️⃣ Time-Series Forecasting
+* Trained on historical climate datasets
+* Learns:
 
-* SARIMA models are trained on historical climate data
-* Captures trends, seasonality, and periodic patterns
+  * Seasonality
+  * Trends
+  * Cyclical patterns
 
-### 2️⃣ City-Based Adjustments
+---
 
-* Each city has predefined offsets based on real-world climate behavior
-* Example:
+### 2️⃣ Real-Time Weather Integration
 
-  * Delhi → hotter (+4°C)
-  * Shimla → colder (-12°C)
-  * Mumbai → higher rainfall (+80 mm)
+* Fetches live forecast data from OpenWeather API
+* Extracts:
 
-### 3️⃣ Final Prediction
+  * Temperature
+  * Rainfall
+  * Derived features
+
+---
+
+### 3️⃣ Feature Engineering
+
+* Creates advanced features like:
+
+  * Temperature range
+  * Month encoding (sin/cos)
+  * Day-of-year
+
+---
+
+### 4️⃣ Machine Learning Prediction
+
+* XGBoost model predicts probability of extreme events
+* Outputs:
+
+  * Risk type
+  * Probability
+  * Severity
+
+---
+
+### 5️⃣ Domain Logic Layer
+
+* Overrides model using real-world thresholds:
+
+  * Rain > 100 mm → Heavy Rain
+  * Temp > 40°C → Heatwave
+  * Temp < 5°C → Cold Wave
+
+---
+
+### 🧮 Final Pipeline
 
 ```
-Final Prediction = SARIMA Output + City Offset
+Forecast Data → Feature Engineering → ML Model → Domain Logic → Final Prediction
 ```
-
-This hybrid approach ensures:
-
-* Realistic predictions
-* Better user experience
-* Explainable AI behavior
 
 ---
 
 ## 🏗️ Tech Stack
 
-**Frontend**
+### Frontend
 
 * React.js
 * Tailwind CSS
 
-**Backend**
+### Backend
 
-* Python (FastAPI / Flask)
-* Pandas
+* FastAPI (Python)
+* Pandas, NumPy
 * Joblib
 
-**Machine Learning**
+### Machine Learning
 
 * SARIMA (statsmodels)
+* XGBoost
+
+### APIs
+
+* OpenWeather API
 
 ---
 
@@ -93,11 +155,19 @@ This hybrid approach ensures:
 ```
 climate-ai/
 │
-├── frontend/              # React UI
+├── frontend/                  # React frontend
+│   └── src/pages/
+│       └── AdvancedPredict.jsx
+│
 ├── backend/
-│   ├── models/           # Trained SARIMA models
-│   ├── predict.py        # Prediction logic
-│   └── main.py           # API endpoints
+│   ├── models/               # Trained ML models
+│   │   ├── xgb_model.pkl
+│   │   ├── feature_cols.pkl
+│   │   └── threshold.pkl
+│   │
+│   ├── predict.py            # SARIMA prediction logic
+│   ├── advanced_predict.py   # Extreme weather detection
+│   └── main.py               # FastAPI routes
 │
 └── README.md
 ```
@@ -106,22 +176,37 @@ climate-ai/
 
 ## ⚙️ Installation & Setup
 
-### 1️⃣ Clone the repository
+### 1️⃣ Clone Repository
 
 ```bash
 git clone https://github.com/your-username/climate-ai.git
 cd climate-ai
 ```
 
-### 2️⃣ Setup Backend
+---
+
+### 2️⃣ Backend Setup
 
 ```bash
 cd backend
 pip install -r requirements.txt
+```
+
+Create `.env` file:
+
+```env
+OPENWEATHER_API_KEY=your_api_key_here
+```
+
+Run server:
+
+```bash
 python main.py
 ```
 
-### 3️⃣ Setup Frontend
+---
+
+### 3️⃣ Frontend Setup
 
 ```bash
 cd frontend
@@ -131,48 +216,54 @@ npm run dev
 
 ---
 
-## 📸 Sample Output
+## 🔐 Security Note
 
-* Input: `Delhi, May 2025`
-* Output:
+* API keys are stored using **environment variables (.env)**
+* `.env` is excluded from version control
+* Ensures secure and production-ready configuration
 
-  * Temperature: **36°C**
-  * Classification: **Moderate**
-  * Trend: Next 6 months forecast
+---
+
+## 📊 Sample Output
+
+**Input:** `Mumbai, 2026-05-15`
+
+**Output:**
+
+* Temperature: 32°C
+* Rainfall: 85 mm
+* Risk Type: Heavy Rain
+* Probability: 0.87
 
 ---
 
 ## 📌 Limitations
 
-* Current SARIMA model is trained at **country level**
-* City-level variations are applied using **deterministic offsets**
-* Daily granularity is approximated from monthly data
+* SARIMA trained on **aggregated datasets**
+* Forecast limited to **5-day API range for extreme prediction**
+* Some city adjustments are heuristic-based
 
 ---
 
 ## 🔮 Future Improvements
 
-* Train **city-specific models**
-* Add **real-time weather API integration**
-* Use **ML models with geo-features (latitude/longitude)**
-* Add **confidence intervals & uncertainty**
-* Improve UI with advanced analytics
+* City-specific ML models
+* LSTM / deep learning models
+* Real-time alert system
+* Interactive dashboards
+* Geo-spatial modeling (lat/lon based predictions)
 
 ---
 
 ## 🧑‍💻 Author
 
 **Swarnadeep Banerjee**
-Passionate about AI, full-stack development, and solving real-world problems.
+AI Enthusiast | Full-Stack Developer | Problem Solver
 
 ---
 
-## ⭐ Final Note
+## ⭐ Final Thought
 
-This project demonstrates that:
+> *“Prediction becomes powerful when data meets domain knowledge.”*
 
-> *AI alone is powerful, but AI + domain knowledge is transformative.*
-
-If you like this project, consider giving it a ⭐ on GitHub!
-
----
+If you found this project interesting, consider giving it a ⭐!
