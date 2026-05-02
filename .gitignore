@@ -15,3 +15,6 @@ __pycache__/
 
 # Logs
 *.log
+
+# Weather history (contains temporary local data)
+backend/city_history/

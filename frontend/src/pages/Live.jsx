@@ -25,7 +25,8 @@ export default function Live() {
   const [climateEvents, setClimateEvents] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
 
-  const API_KEY = "e89da8bbba11b090de6cfc1e745b1d8c";
+  // Use environment variable for API key (VITE_OPENWEATHER_API_KEY in .env)
+  const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY || "";
 
   const gridPoints = [
     [28.6, 77.2], [19.0, 72.8], [35.6, 139.6], [1.3, 103.8],

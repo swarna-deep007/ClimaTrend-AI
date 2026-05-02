@@ -6,6 +6,15 @@ import os
 from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
+from weather_history import (
+    CITY_COORDS,
+    load_history,
+    save_daily_record,
+    bootstrap_from_open_meteo,
+    build_features,
+    features_dict_to_array
+)
+
 load_dotenv()
 
 
@@ -39,22 +48,6 @@ MAX_FORECAST_DAYS = 5
 # ================================
 # HELPER FUNCTIONS
 # ================================
-def get_day_of_year(date_str):
-    """Convert date string to day of year"""
-    date_obj = datetime.strptime(date_str, "%Y-%m-%d")
-    return date_obj.timetuple().tm_yday
-
-def get_month(date_str):
-    """Extract month from date string"""
-    date_obj = datetime.strptime(date_str, "%Y-%m-%d")
-    return date_obj.month
-
-def get_sin_cos_month(month):
-    """Convert month to sin/cos for cyclical encoding"""
-    sin_month = np.sin(2 * np.pi * month / 12)
-    cos_month = np.cos(2 * np.pi * month / 12)
-    return sin_month, cos_month
-
 def validate_date(date_str):
     """Validate that date is within next 5 days"""
     try:
@@ -109,8 +102,8 @@ def find_matching_forecast(forecast_list, target_date):
 
 def extract_features(forecast_entry, date_str):
     """
-    Extract features from forecast entry
-    Returns feature vector
+    Extract base weather metrics from forecast entry
+    Returns: (temp, temp_max, temp_min, prcp) only - used for response
     """
     if not forecast_entry:
         raise Exception("No forecast data available")
@@ -120,40 +113,17 @@ def extract_features(forecast_entry, date_str):
     rain_data = forecast_entry.get('rain', {})
     
     temp = main.get('temp', 0)
-    temp_max = main.get('temp_max', 0)
-    temp_min = main.get('temp_min', 0)
-    prcp = rain_data.get('3h', 0)  # 3-hour rainfall
+    temp_max = main.get('temp_max', temp)
+    temp_min = main.get('temp_min', temp)
     
-    # Calculate additional features
-    month = get_month(date_str)
-    doy = get_day_of_year(date_str)
-    sin_month, cos_month = get_sin_cos_month(month)
-    trange = temp_max - temp_min
+    # If API gives identical values, inject realistic diurnal spread
+    if abs(temp_max - temp_min) < 0.5:
+        temp_max = temp + 3.0
+        temp_min = temp - 3.0
     
-    # Create feature dictionary
-    features = {
-        'PRCP': prcp,
-        'TMAX': temp_max,
-        'TMIN': temp_min,
-        'TAVG': temp,
-        'TRANGE': trange,
-        'MONTH': month,
-        'DOY': doy,
-        'SIN_MONTH': sin_month,
-        'COS_MONTH': cos_month
-    }
+    prcp = rain_data.get('3h', 0)  # 3-hour rainfall in mm
     
-    return features, temp, prcp
-
-def build_feature_vector(features, feature_cols_list):
-    """
-    Build feature vector in correct order
-    Fill missing features with 0
-    """
-    vector = []
-    for col in feature_cols_list:
-        vector.append(features.get(col, 0))
-    return np.array([vector])
+    return temp, temp_max, temp_min, prcp
 
 def apply_domain_logic(features, probability):
     """
@@ -213,7 +183,7 @@ def apply_domain_logic(features, probability):
 # ================================
 def predict_extreme_weather(city, date):
     """
-    Main function to predict extreme weather
+    Main function to predict extreme weather with historical feature engineering
     Returns prediction result
     """
     try:
@@ -232,6 +202,15 @@ def predict_extreme_weather(city, date):
                 "success": False
             }
         
+        # Get city coordinates
+        if city not in CITY_COORDS:
+            return {
+                "error": f"City '{city}' not found in supported cities",
+                "success": False
+            }
+        
+        lat, lon, elev = CITY_COORDS[city]
+        
         # Fetch forecast data
         forecast_list = fetch_forecast_data(city)
         if not forecast_list:
@@ -248,18 +227,48 @@ def predict_extreme_weather(city, date):
                 "success": False
             }
         
-        # Extract features
-        features, temp, prcp = extract_features(forecast_entry, date)
+        # Extract base weather metrics
+        temp, temp_max, temp_min, prcp = extract_features(forecast_entry, date)
         
-        # Build feature vector
-        feature_vector = build_feature_vector(features, feature_cols)
+        # Build engineered features using historical context
+        engineered_features = build_features(
+            city=city,
+            lat=lat,
+            lon=lon,
+            elev=elev,
+            predict_tmax=temp_max,
+            predict_tmin=temp_min,
+            predict_tavg=temp,
+            predict_prcp=prcp,
+            predict_date=date,
+            feature_cols_list=feature_cols
+        )
+        
+        # ★ DEBUG: Show non-zero features before prediction
+        non_zero = {k: v for k, v in engineered_features.items() if v != 0.0}
+        print(f"[DEBUG] Non-zero features: {len(non_zero)} / {len(engineered_features)}")
+        print(f"[DEBUG] Features: {list(non_zero.keys())[:25]}")
+        
+        # ★ CRITICAL: Build DataFrame and enforce EXACT column order
+        X = pd.DataFrame([engineered_features])
+        
+        # Ensure all required columns exist
+        for col in feature_cols:
+            if col not in X.columns:
+                X[col] = 0.0
+        
+        # Reorder to match training (MUST be exact order)
+        X = X[feature_cols]
         
         # Get model prediction probability
-        predictions_proba = xgb_model.predict_proba(feature_vector)
+        predictions_proba = xgb_model.predict_proba(X.values)
         extreme_probability = float(predictions_proba[0][1])  # Probability of extreme class
         
         # Apply domain logic
-        result = apply_domain_logic(features, extreme_probability)
+        result = apply_domain_logic(engineered_features, extreme_probability)
+        
+        # Save this prediction's weather to history for future use
+        save_daily_record(city, temp_max, temp_min, temp, prcp)
         
         # Build response
         return {
