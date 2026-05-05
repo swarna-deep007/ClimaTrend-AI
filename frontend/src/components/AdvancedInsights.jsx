@@ -113,7 +113,9 @@ function AdvancedInsights({ result, city }) {
   // Generate explanation sentences
   const explanationSentences = [
     `Today's maximum temperature is ${tmax}°C — ${
-      parseFloat(tmaxAnom) > 0
+      Math.abs(parseFloat(tmaxAnom)) < 0.01
+        ? `within normal range for ${city} this month.`
+        : parseFloat(tmaxAnom) > 0
         ? `${tmaxAnom}°C above the historical average for ${city} this month, increasing heatwave risk.`
         : `${Math.abs(tmaxAnom)}°C below the historical average for ${city} this month.`
     }`,
@@ -144,16 +146,35 @@ function AdvancedInsights({ result, city }) {
   ];
 
   // Compute risk values for Section A Step 4 gauge
-  const heavyRain =
-    Math.min((af.PRCP || 0) / 50, 1) * result.probability * 100;
-  const heatwave =
-    (af.TMAX_ANOM || 0) > 0
+  const heavyRain = result.isExtreme
+    ? result.riskType === "Heavy Rain"
+      ? Math.min((af.PRCP || 0) / 50, 1) * 100
+      : Math.min((af.PRCP || 0) / 50, 1) * result.probability * 100
+    : Math.min((af.PRCP || 0) / 50, 1) * result.probability * 100;
+
+  const heatwave = result.isExtreme
+    ? result.riskType === "Heatwave"
+      ? (af.TMAX_ANOM || 0) > 0
+        ? Math.min(((af.TMAX_ANOM || 0) / 3) * 100, 100)
+        : 0
+      : (af.TMAX_ANOM || 0) > 0
       ? ((af.TMAX_ANOM || 0) / 3) * result.probability * 100
-      : 0;
-  const coldWave =
-    (af.TMIN_ANOM || 0) < 0
+      : 0
+    : (af.TMAX_ANOM || 0) > 0
+    ? ((af.TMAX_ANOM || 0) / 3) * result.probability * 100
+    : 0;
+
+  const coldWave = result.isExtreme
+    ? result.riskType === "Cold Wave"
+      ? (af.TMIN_ANOM || 0) < 0
+        ? Math.min((Math.abs(af.TMIN_ANOM || 0) / 3) * 100, 100)
+        : 0
+      : (af.TMIN_ANOM || 0) < 0
       ? (Math.abs(af.TMIN_ANOM || 0) / 3) * result.probability * 100
-      : 0;
+      : 0
+    : (af.TMIN_ANOM || 0) < 0
+    ? (Math.abs(af.TMIN_ANOM || 0) / 3) * result.probability * 100
+    : 0;
 
   const riskColor = (v) =>
     v < 5
@@ -172,7 +193,22 @@ function AdvancedInsights({ result, city }) {
   const offset = circumference - filled;
 
   const gaugeColor =
-    pct < 20 ? "#22c55e" : pct < 50 ? "#f59e0b" : "#ef4444";
+    result.isExtreme
+      ? "#ef4444"
+      : pct < 20
+      ? "#22c55e"
+      : pct < 50
+      ? "#f59e0b"
+      : "#ef4444";
+
+  const gaugeLabel =
+    result.isExtreme
+      ? "EXTREME"
+      : pct < 20
+      ? "LOW RISK"
+      : pct < 50
+      ? "MODERATE"
+      : "HIGH RISK";
 
   // ==================== RENDER ====================
   try {
@@ -290,12 +326,16 @@ function AdvancedInsights({ result, city }) {
                       <p className="text-gray-400">Temp Anomaly</p>
                       <p
                         className={`font-mono ${
-                          parseFloat(tmaxAnom) > 0
+                          Math.abs(parseFloat(tmaxAnom)) < 0.01
+                            ? "text-gray-300"
+                            : parseFloat(tmaxAnom) > 0
                             ? "text-orange-400"
                             : "text-blue-400"
                         }`}
                       >
-                        {parseFloat(tmaxAnom) > 0
+                        {Math.abs(parseFloat(tmaxAnom)) < 0.01
+                          ? `≈ ${tmaxAnom}σ`
+                          : parseFloat(tmaxAnom) > 0
                           ? `↑ ${tmaxAnom}σ`
                           : `↓ ${tmaxAnom}σ`}
                       </p>
@@ -451,11 +491,7 @@ function AdvancedInsights({ result, city }) {
                     fontSize="11"
                     fontWeight="600"
                   >
-                    {pct < 20
-                      ? "LOW RISK"
-                      : pct < 50
-                      ? "MODERATE"
-                      : "HIGH RISK"}
+                    {gaugeLabel}
                   </text>
                   {/* Scale labels */}
                   <text x="26" y="118" fill="#9ca3af" fontSize="10">
