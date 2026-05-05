@@ -30,9 +30,9 @@ try:
     feature_cols = joblib.load(os.path.join(MODELS_DIR, "feature_cols.pkl"))
     threshold_val = joblib.load(os.path.join(MODELS_DIR, "threshold.pkl"))
     threshold = threshold_val if isinstance(threshold_val, (int, float)) else 0.5
-    print(f"✓ Models loaded successfully from {MODELS_DIR}")
+    print(f"[OK] Models loaded successfully from {MODELS_DIR}")
 except Exception as e:
-    print(f"✗ Error loading models from {MODELS_DIR}: {e}")
+    print(f"[ERROR] Error loading models from {MODELS_DIR}: {e}")
     import traceback
     traceback.print_exc()
     xgb_model = None
@@ -270,6 +270,12 @@ def predict_extreme_weather(city, date):
         # Save this prediction's weather to history for future use
         save_daily_record(city, temp_max, temp_min, temp, prcp)
         
+        # Extract features for insights
+        feat_vals = {col: float(engineered_features.get(col, 0.0)) 
+                     for col in feature_cols}
+        top_feats = sorted(feat_vals.items(), 
+                      key=lambda x: abs(x[1]), reverse=True)[:15]
+        
         # Build response
         return {
             "success": True,
@@ -281,7 +287,10 @@ def predict_extreme_weather(city, date):
                 "rain": round(prcp, 2)
             },
             "city": city,
-            "date": date
+            "date": date,
+            "top_features": [{"name": k, "value": round(v, 4)} 
+                             for k, v in top_feats],
+            "all_features": feat_vals
         }
     
     except Exception as e:

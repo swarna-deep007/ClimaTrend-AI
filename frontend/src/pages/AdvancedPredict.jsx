@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from 'react-router-dom';
+import AdvancedInsights from '../components/AdvancedInsights';
 
 function AdvancedPredict() {
     const [form, setForm] = useState({
@@ -390,6 +391,11 @@ function AdvancedPredict() {
                                 <p style={{ margin: '4px 0 0 0' }}>🤖 XGBoost ML Model Analysis</p>
                             </div>
                         </div>
+                    )}
+
+                    {/* Advanced Insights Section */}
+                    {result && result.success && (
+                        <AdvancedInsights result={result} city={form.city} />
                     )}
                 </div>
             </div>

@@ -4,6 +4,10 @@ from predict import predict_weather, get_cities
 from advanced_predict import predict_extreme_weather
 from fastapi.middleware.cors import CORSMiddleware
 
+# 👇 NEW IMPORTS (SAFE ADDITION)
+import os
+import json
+
 app = FastAPI()
 
 # CORS CONFIGURATION
@@ -56,4 +60,34 @@ def advanced_predict(data: AdvancedPredictRequest):
             "error": f"Server error: {str(e)}",
             "success": False,
             "detail": str(e)
+        }
+
+# ============================================================
+# 🆕 NEW ENDPOINT (SAFE ADDITION - DOES NOT TOUCH ANYTHING)
+# ============================================================
+
+@app.get("/api/history/{city}")
+def get_history(city: str):
+    try:
+        file_path = os.path.join("city_history", f"{city.lower()}.json")
+
+        if not os.path.exists(file_path):
+            return {
+                "success": True,
+                "data": [],
+                "message": f"No history yet for {city}"
+            }
+
+        with open(file_path, "r") as f:
+            data = json.load(f)
+
+        return {
+            "success": True,
+            "data": data[-10:]
+        }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
         }

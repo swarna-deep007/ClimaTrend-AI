@@ -410,32 +410,32 @@ def build_features(city, lat, lon, elev, predict_tmax, predict_tmin, predict_tav
         month_clim = city_clim.get(month_int, {})
         
         if month_clim:
-            # Use monthly climatology for anomaly scores (NOT ZSCORE - must be ANOM)
-            features["TMAX_ANOM"] = float((predict_tmax - month_clim["tmax"]) / max(month_clim["tmax_std"], 0.1))
-            features["TMIN_ANOM"] = float((predict_tmin - month_clim["tmin"]) / max(month_clim["tmin_std"], 0.1))
-            features["PRCP_ANOM"] = float((predict_prcp - month_clim["prcp"]) / max(month_clim["prcp_std"], 0.1))
+            # Use monthly climatology for Z-score calculation
+            features["TMAX_ZSCORE"] = float((predict_tmax - month_clim["tmax"]) / max(month_clim["tmax_std"], 0.1))
+            features["TMIN_ZSCORE"] = float((predict_tmin - month_clim["tmin"]) / max(month_clim["tmin_std"], 0.1))
+            features["PRCP_ZSCORE"] = float((predict_prcp - month_clim["prcp"]) / max(month_clim["prcp_std"], 0.1))
         else:
             # Fallback to rolling-window logic
             if len(tmax_arr) > 0:
                 tmax_mean = np.mean(tmax_arr)
                 tmax_std = np.std(tmax_arr)
-                features["TMAX_ANOM"] = float((predict_tmax - tmax_mean) / (tmax_std + 1e-6))
+                features["TMAX_ZSCORE"] = float((predict_tmax - tmax_mean) / (tmax_std + 1e-6))
             else:
-                features["TMAX_ANOM"] = 0
+                features["TMAX_ZSCORE"] = 0
             
             if len(tmin_arr) > 0:
                 tmin_mean = np.mean(tmin_arr)
                 tmin_std = np.std(tmin_arr)
-                features["TMIN_ANOM"] = float((predict_tmin - tmin_mean) / (tmin_std + 1e-6))
+                features["TMIN_ZSCORE"] = float((predict_tmin - tmin_mean) / (tmin_std + 1e-6))
             else:
-                features["TMIN_ANOM"] = 0
+                features["TMIN_ZSCORE"] = 0
             
             if len(prcp_arr) > 0:
                 prcp_mean = np.mean(prcp_arr)
                 prcp_std = np.std(prcp_arr)
-                features["PRCP_ANOM"] = float((predict_prcp - prcp_mean) / (prcp_std + 1e-6))
+                features["PRCP_ZSCORE"] = float((predict_prcp - prcp_mean) / (prcp_std + 1e-6))
             else:
-                features["PRCP_ANOM"] = 0
+                features["PRCP_ZSCORE"] = 0
         
         # ====================================================================
         # CONSECUTIVE DAY FEATURES
