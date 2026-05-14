@@ -5,7 +5,6 @@ import AdvancedInsights from '../components/AdvancedInsights';
 
 function AdvancedPredict() {
     const [form, setForm] = useState({
-        predictionType: "Rainfall",
         city: "Kolkata",
         date: "",
     });
@@ -126,6 +125,21 @@ function AdvancedPredict() {
 
     const { minDate, maxDateStr } = getMinMaxDate();
 
+    const selectInputStyle = {
+        width: '100%',
+        padding: '12px',
+        borderRadius: '8px',
+        backgroundColor: '#1a1a1a',
+        border: '2px solid rgba(255, 107, 107, 0.3)',
+        color: 'white',
+        fontSize: '1rem',
+        cursor: 'pointer',
+        option: {
+            backgroundColor: '#1a1a1a',
+            color: 'white'
+        }
+    };
+
     const styles = `
     @keyframes rotate3d {
       0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
@@ -178,6 +192,16 @@ function AdvancedPredict() {
       background: rgba(255, 107, 107, 0.2);
       animation: float 8s ease-in-out infinite;
     }
+
+    select {
+      background-color: #1a1a1a !important;
+      color: white !important;
+    }
+
+    select option {
+      background-color: #1a1a1a !important;
+      color: white !important;
+    }
   `;
 
     return (
@@ -214,26 +238,11 @@ function AdvancedPredict() {
                         Extreme Weather Alert 🚨
                     </h1>
                     <p style={{ fontSize: '0.95rem', color: '#ff8a50', textAlign: 'center', marginBottom: '32px' }}>
-                        AI-powered risk detection for next 5 days
+                        Smart weather risk monitoring for the next 5 days
                     </p>
 
                     {/* Form Card */}
                     <form onSubmit={handleSubmit} style={{ backgroundColor: 'rgba(30, 0, 0, 0.9)', padding: '32px', borderRadius: '16px', boxShadow: '0 20px 60px rgba(255, 107, 107, 0.2)', border: '2px solid rgba(255, 107, 107, 0.3)', backdropFilter: 'blur(10px)' }}>
-
-                        {/* Prediction Type */}
-                        <div style={{ marginBottom: '20px' }}>
-                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', marginBottom: '8px', color: '#ff6b35' }}>Prediction Type</label>
-                            <select
-                                name="predictionType"
-                                value={form.predictionType}
-                                onChange={handleChange}
-                                style={{ width: '100%', padding: '12px', borderRadius: '8px', backgroundColor: 'rgba(255, 107, 107, 0.1)', border: '2px solid rgba(255, 107, 107, 0.3)', color: 'white', fontSize: '1rem', cursor: 'pointer' }}
-                            >
-                                <option value="Rainfall">🌊 Heavy Rainfall</option>
-                                <option value="Heatwave">🔥 Heatwave</option>
-                                <option value="Cold Wave">❄️ Cold Wave</option>
-                            </select>
-                        </div>
 
                         {/* City */}
                         <div style={{ marginBottom: '20px' }}>
@@ -242,7 +251,7 @@ function AdvancedPredict() {
                                 name="city"
                                 value={form.city}
                                 onChange={handleChange}
-                                style={{ width: '100%', padding: '12px', borderRadius: '8px', backgroundColor: 'rgba(255, 107, 107, 0.1)', border: '2px solid rgba(255, 107, 107, 0.3)', color: 'white', fontSize: '1rem', cursor: 'pointer' }}
+                                style={selectInputStyle}
                             >
                                 {cities.map(city => (
                                     <option key={city} value={city}>{city}</option>
@@ -338,7 +347,7 @@ function AdvancedPredict() {
                                             const percent = result.probability * 100;
 
                                             if (percent === 0) return "0%";
-                                            if (percent < 0.1) return percent.toFixed(5) + "%";   // 👈 key change
+                                            if (percent < 0.1) return percent.toFixed(5) + "%";
                                             if (percent < 1) return percent.toFixed(3) + "%";
                                             if (percent < 10) return percent.toFixed(2) + "%";
                                             return percent.toFixed(1) + "%";

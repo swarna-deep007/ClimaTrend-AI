@@ -121,7 +121,7 @@ function Home() {
                         WebkitTextFillColor: 'transparent',
                         cursor: 'pointer'
                     }}>
-                        ClimaTrend AI 🌦️
+                        ClimaTrend 🌦️
                     </div>
 
                     {/* NAV LINKS */}
@@ -166,10 +166,10 @@ function Home() {
                 {/* Hero Section */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 24px', textAlign: 'center' }}>
                     <h1 style={{ fontSize: '4.5rem', fontWeight: 'bold', marginBottom: '24px', background: 'linear-gradient(135deg, #00d4ff, #7c3aed)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                        ClimaTrend AI
+                        ClimaTrend
                     </h1>
                     <p style={{ fontSize: '1.5rem', marginBottom: '48px', maxWidth: '48rem', color: '#b0b0b0' }}>
-                        Predict weather patterns with advanced AI. Get accurate forecasts for rainfall, temperature, and snowfall across different locations.
+                        Predict weather patterns with precision. Get accurate forecasts for rainfall, temperature, and snowfall across different locations.
                     </p>
 
                     {/* Features */}
@@ -211,8 +211,8 @@ function Home() {
                 {/* Footer */}
                 <footer style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)', borderTop: '2px solid #00d4ff33', padding: '60px 40px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '40px', backdropFilter: 'blur(10px)' }}>
                     <div>
-                        <h4 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '16px', color: '#00d4ff' }}>ClimaTrend AI</h4>
-                        <p style={{ fontSize: '0.95rem', color: '#b0b0b0', lineHeight: '1.6' }}>Advanced weather prediction powered by artificial intelligence. Making climate data accessible and actionable for everyone.</p>
+                        <h4 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '16px', color: '#00d4ff' }}>ClimaTrend</h4>
+                        <p style={{ fontSize: '0.95rem', color: '#b0b0b0', lineHeight: '1.6' }}>Advanced weather prediction technology. Making climate data accessible and actionable for everyone.</p>
                     </div>
                     <div>
                         <h4 style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '16px', color: '#00d4ff' }}>Quick Links</h4>
@@ -226,7 +226,7 @@ function Home() {
                     <div>
                         <h4 style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '16px', color: '#00d4ff' }}>Technology</h4>
                         <ul style={{ listStyle: 'none', padding: 0 }}>
-                            <li style={{ marginBottom: '12px' }}><a href="#" style={{ color: '#b0b0b0', textDecoration: 'none', transition: 'color 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.target.style.color = '#00d4ff'} onMouseLeave={(e) => e.target.style.color = '#b0b0b0'}>Machine Learning</a></li>
+                            <li style={{ marginBottom: '12px' }}><a href="#" style={{ color: '#b0b0b0', textDecoration: 'none', transition: 'color 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.target.style.color = '#00d4ff'} onMouseLeave={(e) => e.target.style.color = '#b0b0b0'}>佐d Weather Prediction Technology</a></li>
                             <li style={{ marginBottom: '12px' }}><a href="#" style={{ color: '#b0b0b0', textDecoration: 'none', transition: 'color 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.target.style.color = '#00d4ff'} onMouseLeave={(e) => e.target.style.color = '#b0b0b0'}>API Documentation</a></li>
                             <li style={{ marginBottom: '12px' }}><a href="#" style={{ color: '#b0b0b0', textDecoration: 'none', transition: 'color 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.target.style.color = '#00d4ff'} onMouseLeave={(e) => e.target.style.color = '#b0b0b0'}>Privacy Policy</a></li>
                             <li><a href="#" style={{ color: '#b0b0b0', textDecoration: 'none', transition: 'color 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.target.style.color = '#00d4ff'} onMouseLeave={(e) => e.target.style.color = '#b0b0b0'}>Terms of Service</a></li>
@@ -245,7 +245,7 @@ function Home() {
 
                 {/* Copyright */}
                 <div style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)', padding: '20px', textAlign: 'center', borderTop: '1px solid #00d4ff1a', fontSize: '0.9rem', color: '#b0b0b0' }}>
-                    <p>© 2026 ClimaTrend AI. All rights reserved. | Powered by Advanced Machine Learning</p>
+                    <p>© 2026 ClimaTrend. All rights reserved. | Advanced Weather Prediction Technology</p>
                     <p>Built By <a href="https://www.linkedin.com/in/swarnadeep-banerjee-371827247/" target="_blank" rel="noopener noreferrer" style={{ color: '#00d4ff', textDecoration: 'none', transition: 'color 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.target.style.color = '#7c3aed'} onMouseLeave={(e) => e.target.style.color = '#00d4ff'}>Swarnadeep</a>.</p>
                 </div>
             </div>

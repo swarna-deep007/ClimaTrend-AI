@@ -168,7 +168,7 @@ function About() {
     {
       icon: '🧠',
       title: 'Model',
-      description: 'Machine learning algorithms processing',
+      description: 'Weather data processing',
       color: '#ff6b6b'
     },
     {
@@ -229,7 +229,7 @@ function About() {
               marginBottom: '24px',
               animation: 'slideInUp 1s ease-out'
             }}>
-              ClimaTrend AI 🌦️
+              ClimaTrend 🌦️
             </h1>
 
             <p style={{ 
@@ -239,7 +239,7 @@ function About() {
               animation: 'slideInUp 1s ease-out 0.2s both',
               lineHeight: '1.8'
             }}>
-              Predicting Extreme Weather Events with Machine Learning
+              Predicting Extreme Weather Events Accurately
             </p>
 
             <div style={{ 
@@ -304,7 +304,7 @@ function About() {
           </div>
         </div>
 
-        {/* How AI Thinks Section */}
+        {/* How It Works Section */}
         <div style={{ padding: '80px 24px', backgroundColor: 'rgba(0, 0, 0, 0.3)', position: 'relative' }}>
           <h2 style={{ 
             fontSize: '2.5rem', 
@@ -316,7 +316,7 @@ function About() {
             WebkitTextFillColor: 'transparent',
             animation: 'slideInUp 1s ease-out'
           }}>
-            🧠 How AI Thinks
+            🧠 How It Works
           </h2>
 
           {/* Flow diagram */}
@@ -428,7 +428,7 @@ function About() {
                 {
                   icon: '🌤️',
                   title: 'Extreme Weather Prediction',
-                  desc: 'Advanced machine learning models designed to forecast dangerous conditions like heavy rainfall, heatwaves, and snowstorms with high accuracy.'
+                  desc: 'Advanced weather forecasting designed to predict dangerous conditions like heavy rainfall, heatwaves, and snowstorms with high accuracy.'
                 },
                 {
                   icon: '📈',
@@ -443,7 +443,7 @@ function About() {
                 {
                   icon: '🔬',
                   title: 'Research-Backed',
-                  desc: 'Leverages rigorous machine learning techniques to analyze historical patterns and generate reliable future predictions.'
+                  desc: 'Analyzes historical weather patterns and trends to generate reliable future predictions.'
                 }
               ].map((item, idx) => (
                 <div
