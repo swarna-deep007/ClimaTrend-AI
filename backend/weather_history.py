@@ -112,6 +112,59 @@ HISTORY_DIR = Path(__file__).parent / "city_history"
 # HISTORY STORAGE FUNCTIONS
 # ============================================================================
 
+def _validate_and_clean_record(record):
+    """
+    Validate and clean a single weather record.
+    
+    Returns: validated record dict or None if invalid
+    
+    IMPROVEMENTS:
+    - Remove NaN/None values
+    - Validate ISO date format
+    - Enforce float conversion
+    - Ignore corrupted records safely
+    """
+    try:
+        if not isinstance(record, dict):
+            return None
+        
+        # Validate date is ISO format
+        date_str = record.get("date", "")
+        if not isinstance(date_str, str) or len(date_str) != 10:
+            return None
+        
+        # Try to parse ISO date (YYYY-MM-DD)
+        try:
+            datetime.strptime(date_str, "%Y-%m-%d")
+        except (ValueError, TypeError):
+            return None
+        
+        # Clean numeric fields - convert to float, remove NaN
+        cleaned = {"date": date_str}
+        
+        for field in ["tmax", "tmin", "tavg", "prcp"]:
+            val = record.get(field)
+            
+            # Skip if missing
+            if val is None:
+                return None  # Incomplete record
+            
+            # Skip if NaN-like
+            try:
+                fval = float(val)
+                # Reject NaN or inf
+                if not math.isfinite(fval):
+                    return None
+                cleaned[field] = fval
+            except (ValueError, TypeError):
+                return None  # Cannot convert
+        
+        return cleaned
+    
+    except Exception:
+        return None
+
+
 def ensure_history_dir():
     """Ensure city_history directory exists"""
     try:
@@ -129,7 +182,14 @@ def get_city_history_path(city):
 
 def load_history(city):
     """
-    Load historical weather for a city (max 30 days)
+    Load historical weather for a city (max 60 days, cleaned)
+    
+    IMPROVEMENTS:
+    - Validates and cleans records on load
+    - Removes malformed entries safely
+    - Sorts chronologically
+    - Extends to 60 days for better rolling features
+    
     Returns: list of dicts [{"date": "2026-05-01", "tmax": 32.1, ...}]
     """
     try:
@@ -140,20 +200,47 @@ def load_history(city):
         with open(filepath, "r") as f:
             data = json.load(f)
         
-        # Ensure list, return last 30 entries
-        if isinstance(data, list):
-            return sorted(data[-30:], key=lambda x: x.get("date", ""))
-        return []
+        # Ensure list
+        if not isinstance(data, list):
+            return []
+        
+        # IMPROVEMENT: Validate and clean each record
+        cleaned_history = []
+        for record in data:
+            valid_record = _validate_and_clean_record(record)
+            if valid_record:
+                cleaned_history.append(valid_record)
+        
+        # IMPROVEMENT: Sort chronologically (oldest first)
+        cleaned_history = sorted(cleaned_history, key=lambda x: x.get("date", ""))
+        
+        # IMPROVEMENT: Keep last 60 entries (extended from 30)
+        cleaned_history = cleaned_history[-60:]
+        
+        # IMPROVEMENT: If we removed records, save the cleaned version
+        if len(cleaned_history) < len(data):
+            filepath = get_city_history_path(city)
+            with open(filepath, "w") as f:
+                json.dump(cleaned_history, f, indent=2)
+        
+        return cleaned_history
+    
     except Exception as e:
         print(f"Warning: Error loading history for {city}: {e}")
         return []
 
 
-def save_daily_record(city, tmax, tmin, tavg, prcp):
+def save_daily_record(city, tmax, tmin, tavg, prcp, forecast_date=None):
     """
-    Save or update today's weather record
-    - Deduplicates by date (overwrites if date already exists)
-    - Keeps only last 30 entries
+    Save or update a weather record with strict deduplication.
+    
+    IMPROVEMENTS (from previous implementation):
+    - Accepts forecast_date parameter (previously used datetime.now())
+    - Strict deduplication: one city + one date = exactly one record
+    - Newest forecast replaces older same-date entry
+    - Extended to 60 days (previously 30)
+    - Validates and cleans all records before saving
+    - All numeric values converted to float
     
     Args:
         city: City name
@@ -161,27 +248,54 @@ def save_daily_record(city, tmax, tmin, tavg, prcp):
         tmin: Min temperature (°C)
         tavg: Average temperature (°C)
         prcp: Precipitation (mm)
+        forecast_date: Date string (YYYY-MM-DD). If None, uses today's date.
+    
+    Returns:
+        bool: True if successful, False otherwise
     """
     try:
-        today = datetime.now().date().isoformat()
+        # IMPROVEMENT: Use provided forecast_date or default to today
+        if forecast_date is None:
+            save_date = datetime.now().date().isoformat()
+        else:
+            # Validate forecast_date is ISO format
+            try:
+                parsed_date = datetime.strptime(forecast_date, "%Y-%m-%d")
+                save_date = parsed_date.date().isoformat()
+            except (ValueError, TypeError):
+                print(f"Warning: Invalid forecast_date '{forecast_date}', using today")
+                save_date = datetime.now().date().isoformat()
         
         # Load existing history
         history = load_history(city)
         
-        # Remove today's entry if it exists (deduplicate)
-        history = [h for h in history if h.get("date") != today]
+        # IMPROVEMENT: Remove EXACT same-date entry (strict deduplication)
+        # This ensures: one city + one date = exactly one record
+        history = [h for h in history if h.get("date") != save_date]
         
-        # Append new record
-        history.append({
-            "date": today,
-            "tmax": float(tmax),
-            "tmin": float(tmin),
-            "tavg": float(tavg),
-            "prcp": float(prcp)
-        })
+        # Convert all values to float for consistency
+        new_record = {
+            "date": save_date,
+            "tmax": float(tmax) if tmax is not None else 0.0,
+            "tmin": float(tmin) if tmin is not None else 0.0,
+            "tavg": float(tavg) if tavg is not None else 0.0,
+            "prcp": float(prcp) if prcp is not None else 0.0
+        }
         
-        # Keep only last 30 days
-        history = history[-30:]
+        # Validate the new record before adding
+        validated_record = _validate_and_clean_record(new_record)
+        if not validated_record:
+            print(f"Warning: Invalid record for {city} on {save_date}, skipping save")
+            return False
+        
+        # Append validated record
+        history.append(validated_record)
+        
+        # IMPROVEMENT: Keep last 60 days (extended from 30)
+        history = history[-60:]
+        
+        # IMPROVEMENT: Ensure chronological order
+        history = sorted(history, key=lambda x: x.get("date", ""))
         
         # Save to file
         filepath = get_city_history_path(city)
@@ -189,6 +303,7 @@ def save_daily_record(city, tmax, tmin, tavg, prcp):
             json.dump(history, f, indent=2)
         
         return True
+    
     except Exception as e:
         print(f"Warning: Error saving history for {city}: {e}")
         return False

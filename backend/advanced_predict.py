@@ -268,7 +268,8 @@ def predict_extreme_weather(city, date):
         result = apply_domain_logic(engineered_features, extreme_probability)
         
         # Save this prediction's weather to history for future use
-        save_daily_record(city, temp_max, temp_min, temp, prcp)
+        # IMPROVED: Pass the forecast date instead of using current date
+        save_daily_record(city, temp_max, temp_min, temp, prcp, forecast_date=date)
         
         # Extract features for insights
         feat_vals = {col: float(engineered_features.get(col, 0.0)) 
